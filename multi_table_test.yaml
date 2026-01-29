@@ -1,0 +1,116 @@
+version: "1.0"
+description: "多表测试配置"
+config:
+  seed: 42
+  output_dir: "./output"
+tables:
+  users:
+    config:
+      rows: 10
+    fields:
+      user_id:
+        type: "integer"
+        config:
+          min: 1
+          max: 1000
+      username:
+        type: "string"
+        config:
+          length: 10
+      email:
+        type: "email"
+      name:
+        type: "name"
+      phone:
+        type: "phone"
+      created_at:
+        type: "datetime"
+  products:
+    config:
+      rows: 20
+    fields:
+      product_id:
+        type: "integer"
+        config:
+          min: 1
+          max: 1000
+      product_name:
+        type: "string"
+        config:
+          length: 20
+      price:
+        type: "money"
+        config:
+          min: 10
+          max: 1000
+      stock:
+        type: "integer"
+        config:
+          min: 0
+          max: 1000
+  orders:
+    config:
+      rows: 30
+    fields:
+      order_id:
+        type: "integer"
+        config:
+          min: 1
+          max: 1000
+      user_id:
+        type: "integer"
+        config:
+          min: 1
+          max: 10
+      order_date:
+        type: "datetime"
+      total_amount:
+        type: "money"
+        config:
+          min: 10
+          max: 5000
+  order_items:
+    config:
+      rows: 50
+    fields:
+      item_id:
+        type: "integer"
+        config:
+          min: 1
+          max: 1000
+      order_id:
+        type: "integer"
+        config:
+          min: 1
+          max: 30
+      product_id:
+        type: "integer"
+        config:
+          min: 1
+          max: 20
+      quantity:
+        type: "integer"
+        config:
+          min: 1
+          max: 10
+      unit_price:
+        type: "money"
+        config:
+          min: 10
+          max: 1000
+outputs:
+  csv:
+    enabled: true
+  json:
+    enabled: true
+  excel:
+    enabled: true
+  sql:
+    enabled: true
+    config:
+      dialect: "postgresql"
+      output_file: "multi_table.sql"
+      batch_size: 100
+      include_create_table: true
+      include_truncate_table: true
+      insert_mode: "insert"

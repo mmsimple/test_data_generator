@@ -1,0 +1,65 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false
+  },
+  "agents": {
+    "sisyphus": {
+      "model": "nvidia/deepseek-ai/deepseek-v3.2"
+    },
+    "oracle": {
+      "model": "nvidia/deepseek-ai/deepseek-r1-0528"
+    },
+    "librarian": {
+      "model": "nvidia/qwen/qwen3-235b-a22b"
+    },
+    "explore": {
+      "model": "nvidia/qwen/qwen3-next-80b-a3b-instruct"
+    },
+    "multimodal-looker": {
+      "model": "nvidia/meta/llama-3.2-11b-vision-instruct"
+    },
+    "prometheus": {
+      "model": "nvidia/deepseek-ai/deepseek-r1-0528"
+    },
+    "metis": {
+      "model": "nvidia/deepseek-ai/deepseek-v3.2"
+    },
+    "atlas": {
+      "model": "nvidia/qwen/qwen3-235b-a22b"
+    },
+    "momus": {
+      "model": "nvidia/deepseek-ai/deepseek-r1-0528"
+    },
+    "document-writer": {
+      "model": "nvidia/z-ai/glm4.7"
+    }
+  },
+  "categories": {
+    "visual-engineering": {
+      "model": "nvidia/qwen/qwen3-coder-480b-a35b-instruct"
+    },
+    "quick": {
+      "model": "nvidia/qwen/qwen3-next-80b-a3b-instruct"
+    },
+    "unspecified-low": {
+      "model": "nvidia/qwen/qwen3-next-80b-a3b-instruct"
+    },
+    "unspecified-high": {
+      "model": "nvidia/deepseek-ai/deepseek-v3.2"
+    },
+    "ultrabrain": {
+      "model": "nvidia/deepseek-ai/deepseek-r1-0528"
+    },
+    "artistry": {
+      "model": "nvidia/z-ai/glm4.7"
+    },
+    "writing": {
+      "model": "nvidia/z-ai/glm4.7"
+    }
+  },
+  "experimental": {
+    "aggressive_truncation": true
+  }
+}

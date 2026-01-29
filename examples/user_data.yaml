@@ -1,0 +1,146 @@
+# 测试数据生成器配置文件示例 - 用户数据
+version: "1.0"
+description: "生成用户测试数据"
+
+# 数据生成配置
+config:
+  rows: 1000                    # 生成的数据行数
+  seed: 42                      # 随机种子，确保可重复性
+  output_dir: "./output"        # 输出目录
+  
+# 字段定义
+fields:
+  # 用户ID - 自增整数
+  user_id:
+    type: "integer"
+    config:
+      start: 1
+      increment: 1
+      primary_key: true
+    metadata:
+      description: "用户唯一标识符"
+      nullable: false
+  
+  # 用户名 - 随机生成
+  username:
+    type: "string"
+    config:
+      generator: "user_name"
+      min_length: 3
+      max_length: 20
+    metadata:
+      description: "用户名"
+      unique: true
+  
+  # 邮箱地址 - 基于用户名生成
+  email:
+    type: "string"
+    config:
+      generator: "email"
+      domain: "example.com"
+    dependencies:
+      - "username"
+  
+  # 年龄 - 正态分布
+  age:
+    type: "integer"
+    config:
+      min: 18
+      max: 
+        value: 80
+      distribution: "normal"
+      mean: 35
+      std_dev: 10
+  
+  # 性别 - 分类数据
+  gender:
+    type: "choice"
+    config:
+      choices: ["M", "F"]
+      weights: [0.5, 0.5]
+    metadata:
+      description: "性别"
+  
+  # 注册日期 - 时间范围
+  registration_date:
+    type: "date"
+    config:
+      start_date: "2023-01-01"
+      end_date: "2024-12-31"
+      format: "%Y-%m-%d"
+  
+  # 用户等级 - 带权重的选择
+  user_level:
+    type: "choice"
+    config:
+      choices: ["青铜", "白银", "黄金", "白金", "钻石"]
+      weights: [0.3, 0.25, 0.2, 0.15, 0.1]
+  
+  # 账户余额 - 浮点数
+  balance:
+    type: "float"
+    config:
+      min: 0.0
+      max: 10000.0
+      precision: 2
+  
+  # 是否激活 - 布尔值
+  is_active:
+    type: "boolean"
+    config:
+      true_probability: 0.8
+
+# 输出格式配置
+outputs:
+  sql:
+    enabled: true
+    config:
+      table_name: "users"
+      dialect: "postgresql"
+      output_file: "users.sql"
+      batch_size: 100
+  
+  csv:
+    enabled: true
+    config:
+      output_file: "users.csv"
+      include_header: true
+      delimiter: ","
+  
+  excel:
+    enabled: true
+    config:
+      output_file: "users.xlsx"
+      sheet_name: "Users"
+      auto_filter: true
+  
+  json:
+    enabled: true
+    config:
+      output_file: "users.json"
+      indent: 2
+      array_format: true
+
+# 数据验证规则
+validations:
+  - field: "age"
+    rule: ">= 18"
+    message: "年龄必须大于等于18岁"
+  
+  - field: "balance"
+    rule: ">= 0"
+    message: "账户余额不能为负数"
+  
+  - field: "username"
+    rule: "length >= 3 and length <= 20"
+    message: "用户名长度必须在3-20个字符之间"
+
+# 数据关系定义（可选）
+relations:
+  - type: "foreign_key"
+    source_field: "user_id"
+    target_table: "orders"
+    target_field: "user_id"
+    
+  - type: "unique_constraint"
+    fields: ["username", "email"]

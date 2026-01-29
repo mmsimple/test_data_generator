@@ -1,0 +1,138 @@
+version: '1.0'
+description: 用户测试数据模板
+config:
+  rows: 100
+  seed: 42
+  output_dir: ./output
+fields:
+  user_id:
+    type: integer
+    config:
+      start: 1
+      increment: 1
+    metadata:
+      description: 用户ID
+      primary_key: true
+      nullable: false
+  username:
+    type: string
+    config:
+      generator: random_string
+      min_length: 5
+      max_length: 20
+      prefix: user_
+    metadata:
+      description: 用户名
+      unique: true
+  name:
+    type: name
+    config:
+      gender: both
+      locale: zh_CN
+    metadata:
+      description: 姓名
+  email:
+    type: email
+    config:
+      domain: example.com
+    dependencies:
+    - username
+    metadata:
+      description: 邮箱地址
+  age:
+    type: integer
+    config:
+      min: 18
+      max: 80
+      distribution: normal
+      mean: 35
+      std_dev: 10
+    metadata:
+      description: 年龄
+  gender:
+    type: choice
+    config:
+      choices:
+      - M
+      - F
+      weights:
+      - 0.5
+      - 0.5
+    metadata:
+      description: 性别
+  phone:
+    type: phone
+    config:
+      operator: null
+    metadata:
+      description: 手机号码
+  registration_date:
+    type: date
+    config:
+      start_date: '2023-01-01'
+      end_date: '2024-12-31'
+      format: '%Y-%m-%d'
+    metadata:
+      description: 注册日期
+  balance:
+    type: money
+    config:
+      min: 0.0
+      max: 10000.0
+      precision: 2
+      currency: CNY
+      distribution: normal
+      mean: 5000.0
+      std_dev: 1200.0
+    metadata:
+      description: 账户余额
+  is_active:
+    type: boolean
+    config:
+      true_probability: 0.8
+    metadata:
+      description: 是否激活
+outputs:
+  csv:
+    enabled: true
+    config:
+      output_file: users.csv
+      include_header: true
+      delimiter: ','
+  json:
+    enabled: true
+    config:
+      output_file: users.json
+      indent: 2
+      array_format: true
+  excel:
+    enabled: true
+    config:
+      output_file: users.xlsx
+      sheet_name: Users
+      auto_filter: true
+  sql:
+    enabled: true
+    config:
+      table_name: users
+      dialect: postgresql
+      output_file: users.sql
+      batch_size: 100
+      include_create_table: true
+      include_truncate_table: true
+      insert_mode: insert
+validations:
+- field: age
+  rule: '>= 18'
+  message: 年龄必须大于等于18岁
+- field: balance
+  rule: '>= 0'
+  message: 账户余额不能为负数
+- field: username
+  rule: length >= 5 and length <= 20
+  message: 用户名长度必须在5-20个字符之间
+relations:
+- type: unique_constraint
+  fields:
+  - username
+  - email

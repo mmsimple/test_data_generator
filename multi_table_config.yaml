@@ -1,0 +1,350 @@
+version: '1.0'
+description: '多表关联测试数据配置'
+config:
+  rows: 100
+  seed: 42
+  output_dir: './output'
+
+# 数据表定义
+tables:
+  # 用户表
+  users:
+    config:
+      rows: 50  # 生成50个用户
+    fields:
+      user_id:
+        type: integer
+        config:
+          start: 1
+          increment: 1
+        metadata:
+          description: '用户ID'
+          primary_key: true
+          nullable: false
+      username:
+        type: string
+        config:
+          generator: random_string
+          min_length: 5
+          max_length: 20
+          prefix: user_
+        metadata:
+          description: '用户名'
+          unique: true
+      name:
+        type: name
+        config:
+          gender: both
+          locale: zh_CN
+        metadata:
+          description: '姓名'
+      email:
+        type: email
+        config:
+          domain: example.com
+        dependencies:
+          - username
+        metadata:
+          description: '邮箱地址'
+      age:
+        type: integer
+        config:
+          min: 18
+          max: 80
+          distribution: normal
+          mean: 35
+          std_dev: 10
+        metadata:
+          description: '年龄'
+      gender:
+        type: choice
+        config:
+          choices:
+            - M
+            - F
+          weights:
+            - 0.5
+            - 0.5
+        metadata:
+          description: '性别'
+      phone:
+        type: phone
+        config:
+          operator: null
+        metadata:
+          description: '手机号码'
+      registration_date:
+        type: date
+        config:
+          start_date: '2023-01-01'
+          end_date: '2024-12-31'
+        metadata:
+          description: '注册日期'
+      is_active:
+        type: boolean
+        config:
+          true_probability: 0.8
+        metadata:
+          description: '是否激活'
+
+  # 产品表
+  products:
+    config:
+      rows: 30  # 生成30个产品
+    fields:
+      product_id:
+        type: integer
+        config:
+          start: 1
+          increment: 1
+        metadata:
+          description: '产品ID'
+          primary_key: true
+          nullable: false
+      product_name:
+        type: string
+        config:
+          generator: random_string
+          min_length: 10
+          max_length: 50
+        metadata:
+          description: '产品名称'
+      category:
+        type: choice
+        config:
+          choices:
+            - Electronics
+            - Clothing
+            - Books
+            - Home
+            - Sports
+          weights:
+            - 0.3
+            - 0.25
+            - 0.2
+            - 0.15
+            - 0.1
+        metadata:
+          description: '产品类别'
+      price:
+        type: money
+        config:
+          min: 10.0
+          max: 1000.0
+          precision: 2
+          distribution: normal
+          mean: 150.0
+          std_dev: 100.0
+        metadata:
+          description: '产品价格'
+      stock_quantity:
+        type: integer
+        config:
+          min: 0
+          max: 1000
+          distribution: normal
+          mean: 200
+          std_dev: 100
+        metadata:
+          description: '库存数量'
+      created_at:
+        type: date
+        config:
+          start_date: '2022-01-01'
+          end_date: '2024-12-31'
+        metadata:
+          description: '创建日期'
+
+  # 订单表
+  orders:
+    config:
+      rows: 100  # 生成100个订单
+    fields:
+      order_id:
+        type: integer
+        config:
+          start: 1
+          increment: 1
+        metadata:
+          description: '订单ID'
+          primary_key: true
+          nullable: false
+      user_id:
+        type: integer
+        config:
+          min: 1
+          max: 50  # 关联到users表的user_id
+          distribution: uniform
+        metadata:
+          description: '用户ID（外键）'
+          foreign_key: true
+          references: users.user_id
+      order_date:
+        type: date
+        config:
+          start_date: '2023-01-01'
+          end_date: '2024-12-31'
+        metadata:
+          description: '订单日期'
+      total_amount:
+        type: money
+        config:
+          min: 10.0
+          max: 5000.0
+          precision: 2
+          distribution: normal
+          mean: 500.0
+          std_dev: 200.0
+        metadata:
+          description: '订单总金额'
+      status:
+        type: choice
+        config:
+          choices:
+            - pending
+            - processing
+            - completed
+            - cancelled
+          weights:
+            - 0.2
+            - 0.3
+            - 0.4
+            - 0.1
+        metadata:
+          description: '订单状态'
+
+  # 订单项表
+  order_items:
+    config:
+      rows: 200  # 生成200个订单项
+    fields:
+      order_item_id:
+        type: integer
+        config:
+          start: 1
+          increment: 1
+        metadata:
+          description: '订单项ID'
+          primary_key: true
+          nullable: false
+      order_id:
+        type: integer
+        config:
+          min: 1
+          max: 100  # 关联到orders表的order_id
+          distribution: uniform
+        metadata:
+          description: '订单ID（外键）'
+          foreign_key: true
+          references: orders.order_id
+      product_id:
+        type: integer
+        config:
+          min: 1
+          max: 30  # 关联到products表的product_id
+          distribution: uniform
+        metadata:
+          description: '产品ID（外键）'
+          foreign_key: true
+          references: products.product_id
+      quantity:
+        type: integer
+        config:
+          min: 1
+          max: 10
+          distribution: uniform
+        metadata:
+          description: '产品数量'
+      unit_price:
+        type: money
+        config:
+          min: 10.0
+          max: 1000.0
+          precision: 2
+          distribution: normal
+          mean: 150.0
+          std_dev: 100.0
+        metadata:
+          description: '单价'
+      subtotal:
+        type: money
+        config:
+          min: 10.0
+          max: 10000.0
+          precision: 2
+          distribution: normal
+          mean: 500.0
+          std_dev: 300.0
+        metadata:
+          description: '小计金额'
+
+# 输出配置
+outputs:
+  csv:
+    enabled: true
+    config:
+      include_header: true
+      delimiter: ','
+  json:
+    enabled: true
+    config:
+      indent: 2
+      array_format: true
+  excel:
+    enabled: true
+    config:
+      sheet_name: Data
+      auto_filter: true
+  sql:
+    enabled: true
+    config:
+      dialect: postgresql
+      batch_size: 100
+      include_create_table: true
+      include_truncate_table: true
+      insert_mode: insert
+
+# 验证规则
+validations:
+  - field: users.age
+    rule: '>= 18'
+    message: '年龄必须大于等于18岁'
+  - field: users.username
+    rule: length >= 5 and length <= 20
+    message: '用户名长度必须在5-20个字符之间'
+  - field: products.price
+    rule: '>= 10'
+    message: '产品价格必须大于等于10元'
+  - field: orders.total_amount
+    rule: '>= 0'
+    message: '订单总金额不能为负数'
+  - field: order_items.quantity
+    rule: '>= 1'
+    message: '产品数量必须大于等于1个'
+
+# 关联关系
+relations:
+  - type: foreign_key
+    from_table: orders
+    from_field: user_id
+    to_table: users
+    to_field: user_id
+  - type: foreign_key
+    from_table: order_items
+    from_field: order_id
+    to_table: orders
+    to_field: order_id
+  - type: foreign_key
+    from_table: order_items
+    from_field: product_id
+    to_table: products
+    to_field: product_id
+  - type: unique_constraint
+    table: users
+    fields:
+      - username
+      - email
+  - type: unique_constraint
+    table: products
+    fields:
+      - product_name

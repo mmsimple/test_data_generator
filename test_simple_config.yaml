@@ -1,0 +1,50 @@
+version: "1.0"
+description: "简单测试配置"
+
+config:
+  rows: 10
+  seed: 123
+  output_dir: "./test_output"
+
+fields:
+  id:
+    type: "integer"
+    config:
+      start: 1
+      increment: 1
+
+  name:
+    type: "string"
+    config:
+      min_length: 5
+      max_length: 10
+
+  age:
+    type: "integer"
+    config:
+      min: 20
+      max: 50
+      distribution: "uniform"
+
+  active:
+    type: "boolean"
+    config:
+      true_probability: 0.7
+
+outputs:
+  csv:
+    enabled: true
+    config:
+      output_file: "test_output/simple.csv"
+      include_header: true
+
+  json:
+    enabled: true
+    config:
+      output_file: "test_output/simple.json"
+      indent: 2
+
+validations:
+  - field: "age"
+    rule: ">= 20"
+    message: "年龄必须大于等于20岁"
