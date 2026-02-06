@@ -305,15 +305,18 @@ class DataGenerator:
         outputs_config = self.config.get('outputs', {})
         format_config = outputs_config.get(format_type, {}).get('config', {})
         
+        # 获取配置中的输出目录
+        output_dir = self.config.get('config', {}).get('output_dir', './output')
+        
         # 多表模式下使用表名作为文件名前缀
         if table_name:
             default_filename = f"{table_name}_{default_filename}"
         
-        filepath = format_config.get('output_file', f"./output/{default_filename}")
+        filepath = format_config.get('output_file', f"{output_dir}/{default_filename}")
         
         # 确保文件路径是字符串
         if not isinstance(filepath, str):
-            filepath = f"./output/{default_filename}"
+            filepath = f"{output_dir}/{default_filename}"
             
         return filepath
     
