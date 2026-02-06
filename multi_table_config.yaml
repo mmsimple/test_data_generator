@@ -1,9 +1,14 @@
+# 配置文件版本号，用于版本控制和兼容性检查
 version: '1.0'
+
+# 配置文件描述，说明此配置的用途
 description: '多表关联测试数据配置'
+
+# 全局配置
 config:
-  rows: 100
-  seed: 42
-  output_dir: './output'
+  rows: 100          # 默认生成的行数，可被各表单独配置覆盖
+  seed: 42           # 随机种子，确保生成结果可重复
+  output_dir: './output'  # 输出目录，生成的数据文件将保存在此目录
 
 # 数据表定义
 tables:
@@ -12,339 +17,420 @@ tables:
     config:
       rows: 50  # 生成50个用户
     fields:
+      # 用户ID字段
       user_id:
-        type: integer
+        type: integer              # 字段类型：整数
         config:
-          start: 1
-          increment: 1
+          start: 1                 # 起始值
+          increment: 1              # 增量值，每次递增1
         metadata:
-          description: '用户ID'
-          primary_key: true
-          nullable: false
+          description: '用户ID'     # 字段描述
+          primary_key: true         # 是否为主键
+          nullable: false           # 是否可为空
+
+      # 用户名字段
       username:
-        type: string
+        type: string               # 字段类型：字符串
         config:
-          generator: random_string
-          min_length: 5
-          max_length: 20
+          generator: random_string  # 生成器：随机字符串
+          min_length: 5             # 最小长度
+          max_length: 15            # 最大长度（加上前缀后不超过20）
           prefix: user_
         metadata:
-          description: '用户名'
-          unique: true
+          description: '用户名'     # 字段描述
+          unique: true              # 是否唯一
+
+      # 姓名字段
       name:
-        type: name
+        type: name                  # 字段类型：姓名
         config:
-          gender: both
-          locale: zh_CN
+          gender: both              # 性别：男女都可
+          locale: zh_CN             # 语言区域：中文
         metadata:
-          description: '姓名'
+          description: '姓名'       # 字段描述
+
+      # 邮箱字段
       email:
-        type: email
+        type: email                 # 字段类型：邮箱
         config:
-          domain: example.com
+          domain: example.com       # 邮箱域名
         dependencies:
-          - username
+          - username                # 依赖字段：用户名
         metadata:
-          description: '邮箱地址'
+          description: '邮箱地址'   # 字段描述
+
+      # 年龄字段
       age:
-        type: integer
+        type: integer               # 字段类型：整数
         config:
-          min: 18
-          max: 80
-          distribution: normal
-          mean: 35
-          std_dev: 10
+          min: 18                   # 最小值
+          max: 80                   # 最大值
+          distribution: normal      # 分布类型：正态分布
+          mean: 35                  # 均值
+          std_dev: 10               # 标准差
         metadata:
-          description: '年龄'
+          description: '年龄'       # 字段描述
+
+      # 性别字段
       gender:
-        type: choice
+        type: choice                # 字段类型：选择
         config:
           choices:
-            - M
-            - F
+            - M                     # 选项：男
+            - F                     # 选项：女
           weights:
-            - 0.5
-            - 0.5
+            - 0.5                   # 权重：男 50%
+            - 0.5                   # 权重：女 50%
         metadata:
-          description: '性别'
+          description: '性别'       # 字段描述
+
+      # 手机号码字段
       phone:
-        type: phone
+        type: phone                 # 字段类型：手机号码
         config:
-          operator: null
+          operator: null            # 运营商：不指定
         metadata:
-          description: '手机号码'
+          description: '手机号码'   # 字段描述
+
+      # 注册日期字段
       registration_date:
-        type: date
+        type: date                  # 字段类型：日期
         config:
-          start_date: '2023-01-01'
-          end_date: '2024-12-31'
+          start_date: '2023-01-01'  # 开始日期
+          end_date: '2024-12-31'    # 结束日期
         metadata:
-          description: '注册日期'
+          description: '注册日期'   # 字段描述
+
+      # 是否激活字段
       is_active:
-        type: boolean
+        type: boolean               # 字段类型：布尔值
         config:
-          true_probability: 0.8
+          true_probability: 0.8     # 为true的概率：80%
         metadata:
-          description: '是否激活'
+          description: '是否激活'   # 字段描述
 
   # 产品表
   products:
     config:
       rows: 30  # 生成30个产品
     fields:
+      # 产品ID字段
       product_id:
-        type: integer
+        type: integer              # 字段类型：整数
         config:
-          start: 1
-          increment: 1
+          start: 1                 # 起始值
+          increment: 1              # 增量值，每次递增1
         metadata:
-          description: '产品ID'
-          primary_key: true
-          nullable: false
+          description: '产品ID'     # 字段描述
+          primary_key: true         # 是否为主键
+          nullable: false           # 是否可为空
+
+      # 产品名称字段
       product_name:
-        type: string
+        type: string               # 字段类型：字符串
         config:
-          generator: random_string
-          min_length: 10
-          max_length: 50
+          generator: random_string  # 生成器：随机字符串
+          min_length: 10            # 最小长度
+          max_length: 50            # 最大长度
         metadata:
-          description: '产品名称'
+          description: '产品名称'   # 字段描述
+
+      # 产品类别字段
       category:
-        type: choice
+        type: choice                # 字段类型：选择
         config:
           choices:
-            - Electronics
-            - Clothing
-            - Books
-            - Home
-            - Sports
+            - Electronics           # 选项：电子产品
+            - Clothing              # 选项：服装
+            - Books                 # 选项：书籍
+            - Home                  # 选项：家居用品
+            - Sports                # 选项：运动用品
           weights:
-            - 0.3
-            - 0.25
-            - 0.2
-            - 0.15
-            - 0.1
+            - 0.3                   # 权重：电子产品 30%
+            - 0.25                  # 权重：服装 25%
+            - 0.2                   # 权重：书籍 20%
+            - 0.15                  # 权重：家居用品 15%
+            - 0.1                   # 权重：运动用品 10%
         metadata:
-          description: '产品类别'
+          description: '产品类别'   # 字段描述
+
+      # 产品价格字段
       price:
-        type: money
+        type: money                 # 字段类型：金额
         config:
-          min: 10.0
-          max: 1000.0
-          precision: 2
-          distribution: normal
-          mean: 150.0
-          std_dev: 100.0
+          min: 10.0                 # 最小值
+          max: 1000.0               # 最大值
+          precision: 2              # 小数精度
+          distribution: normal      # 分布类型：正态分布
+          mean: 150.0               # 均值
+          std_dev: 100.0            # 标准差
         metadata:
-          description: '产品价格'
+          description: '产品价格'   # 字段描述
+
+      # 库存数量字段
       stock_quantity:
-        type: integer
+        type: integer               # 字段类型：整数
         config:
-          min: 0
-          max: 1000
-          distribution: normal
-          mean: 200
-          std_dev: 100
+          min: 0                    # 最小值
+          max: 1000                 # 最大值
+          distribution: normal      # 分布类型：正态分布
+          mean: 200                 # 均值
+          std_dev: 100              # 标准差
         metadata:
-          description: '库存数量'
+          description: '库存数量'   # 字段描述
+
+      # 创建日期字段
       created_at:
-        type: date
+        type: date                  # 字段类型：日期
         config:
-          start_date: '2022-01-01'
-          end_date: '2024-12-31'
+          start_date: '2022-01-01'  # 开始日期
+          end_date: '2024-12-31'    # 结束日期
         metadata:
-          description: '创建日期'
+          description: '创建日期'   # 字段描述
 
   # 订单表
   orders:
     config:
       rows: 100  # 生成100个订单
     fields:
+      # 订单ID字段
       order_id:
-        type: integer
+        type: integer              # 字段类型：整数
         config:
-          start: 1
-          increment: 1
+          start: 1                 # 起始值
+          increment: 1              # 增量值，每次递增1
         metadata:
-          description: '订单ID'
-          primary_key: true
-          nullable: false
+          description: '订单ID'     # 字段描述
+          primary_key: true         # 是否为主键
+          nullable: false           # 是否可为空
+
+      # 用户ID字段（外键）
       user_id:
-        type: integer
+        type: integer               # 字段类型：整数
         config:
-          min: 1
-          max: 50  # 关联到users表的user_id
-          distribution: uniform
+          min: 1                    # 最小值
+          max: 50                   # 最大值，关联到users表的user_id
+          distribution: uniform     # 分布类型：均匀分布
         metadata:
-          description: '用户ID（外键）'
-          foreign_key: true
-          references: users.user_id
+          description: '用户ID（外键）'  # 字段描述
+          foreign_key: true         # 是否为外键
+          references: users.user_id  # 引用：users表的user_id字段
+
+      # 订单日期字段
       order_date:
-        type: date
+        type: date                  # 字段类型：日期
         config:
-          start_date: '2023-01-01'
-          end_date: '2024-12-31'
+          start_date: '2023-01-01'  # 开始日期
+          end_date: '2024-12-31'    # 结束日期
         metadata:
-          description: '订单日期'
+          description: '订单日期'   # 字段描述
+
+      # 订单总金额字段
       total_amount:
-        type: money
+        type: money                 # 字段类型：金额
         config:
-          min: 10.0
-          max: 5000.0
-          precision: 2
-          distribution: normal
-          mean: 500.0
-          std_dev: 200.0
+          min: 10.0                 # 最小值
+          max: 5000.0               # 最大值
+          precision: 2              # 小数精度
+          distribution: normal      # 分布类型：正态分布
+          mean: 500.0               # 均值
+          std_dev: 200.0            # 标准差
         metadata:
-          description: '订单总金额'
+          description: '订单总金额'  # 字段描述
+
+      # 订单状态字段
       status:
-        type: choice
+        type: choice                # 字段类型：选择
         config:
           choices:
-            - pending
-            - processing
-            - completed
-            - cancelled
+            - pending               # 选项：待处理
+            - processing            # 选项：处理中
+            - completed             # 选项：已完成
+            - cancelled             # 选项：已取消
           weights:
-            - 0.2
-            - 0.3
-            - 0.4
-            - 0.1
+            - 0.2                   # 权重：待处理 20%
+            - 0.3                   # 权重：处理中 30%
+            - 0.4                   # 权重：已完成 40%
+            - 0.1                   # 权重：已取消 10%
         metadata:
-          description: '订单状态'
+          description: '订单状态'   # 字段描述
 
   # 订单项表
   order_items:
     config:
       rows: 200  # 生成200个订单项
     fields:
+      # 订单项ID字段
       order_item_id:
-        type: integer
+        type: integer              # 字段类型：整数
         config:
-          start: 1
-          increment: 1
+          start: 1                 # 起始值
+          increment: 1              # 增量值，每次递增1
         metadata:
-          description: '订单项ID'
-          primary_key: true
-          nullable: false
+          description: '订单项ID'   # 字段描述
+          primary_key: true         # 是否为主键
+          nullable: false           # 是否可为空
+
+      # 订单ID字段（外键）
       order_id:
-        type: integer
+        type: integer               # 字段类型：整数
         config:
-          min: 1
-          max: 100  # 关联到orders表的order_id
-          distribution: uniform
+          min: 1                    # 最小值
+          max: 100                  # 最大值，关联到orders表的order_id
+          distribution: uniform     # 分布类型：均匀分布
         metadata:
-          description: '订单ID（外键）'
-          foreign_key: true
-          references: orders.order_id
+          description: '订单ID（外键）'  # 字段描述
+          foreign_key: true         # 是否为外键
+          references: orders.order_id  # 引用：orders表的order_id字段
+
+      # 产品ID字段（外键）
       product_id:
-        type: integer
+        type: integer               # 字段类型：整数
         config:
-          min: 1
-          max: 30  # 关联到products表的product_id
-          distribution: uniform
+          min: 1                    # 最小值
+          max: 30                   # 最大值，关联到products表的product_id
+          distribution: uniform     # 分布类型：均匀分布
         metadata:
-          description: '产品ID（外键）'
-          foreign_key: true
-          references: products.product_id
+          description: '产品ID（外键）'  # 字段描述
+          foreign_key: true         # 是否为外键
+          references: products.product_id  # 引用：products表的product_id字段
+
+      # 产品数量字段
       quantity:
-        type: integer
+        type: integer               # 字段类型：整数
         config:
-          min: 1
-          max: 10
-          distribution: uniform
+          min: 1                    # 最小值
+          max: 10                   # 最大值
+          distribution: uniform     # 分布类型：均匀分布
         metadata:
-          description: '产品数量'
+          description: '产品数量'   # 字段描述
+
+      # 单价字段
       unit_price:
-        type: money
+        type: money                 # 字段类型：金额
         config:
-          min: 10.0
-          max: 1000.0
-          precision: 2
-          distribution: normal
-          mean: 150.0
-          std_dev: 100.0
+          min: 10.0                 # 最小值
+          max: 1000.0               # 最大值
+          precision: 2              # 小数精度
+          distribution: normal      # 分布类型：正态分布
+          mean: 150.0               # 均值
+          std_dev: 100.0            # 标准差
         metadata:
-          description: '单价'
+          description: '单价'       # 字段描述
+
+      # 小计金额字段
       subtotal:
-        type: money
+        type: money                 # 字段类型：金额
         config:
-          min: 10.0
-          max: 10000.0
-          precision: 2
-          distribution: normal
-          mean: 500.0
-          std_dev: 300.0
+          min: 10.0                 # 最小值
+          max: 10000.0              # 最大值
+          precision: 2              # 小数精度
+          distribution: normal      # 分布类型：正态分布
+          mean: 500.0               # 均值
+          std_dev: 300.0            # 标准差
         metadata:
-          description: '小计金额'
+          description: '小计金额'   # 字段描述
 
 # 输出配置
+# 定义生成数据的输出格式和相关配置
 outputs:
+  # CSV格式输出
   csv:
-    enabled: true
+    enabled: true               # 是否启用
     config:
-      include_header: true
-      delimiter: ','
+      include_header: true      # 是否包含表头
+      delimiter: ','            # 分隔符
+
+  # JSON格式输出
   json:
-    enabled: true
+    enabled: true               # 是否启用
     config:
-      indent: 2
-      array_format: true
+      indent: 2                 # 缩进空格数
+      array_format: true        # 是否使用数组格式
+
+  # Excel格式输出
   excel:
-    enabled: true
+    enabled: true               # 是否启用
     config:
-      sheet_name: Data
-      auto_filter: true
+      sheet_name: Data          # 工作表名称
+      auto_filter: true         # 是否启用自动筛选
+
+  # SQL格式输出
   sql:
-    enabled: true
+    enabled: true               # 是否启用
     config:
-      dialect: postgresql
-      batch_size: 100
-      include_create_table: true
-      include_truncate_table: true
-      insert_mode: insert
+      dialect: postgresql       # SQL方言
+      batch_size: 100           # 批处理大小
+      include_create_table: true  # 是否包含创建表语句
+      include_truncate_table: true  # 是否包含清空表语句
+      insert_mode: insert       # 插入模式：insert（插入）或 replace（替换）
 
 # 验证规则
+# 定义对生成数据的验证条件，确保数据符合业务规则
 validations:
-  - field: users.age
-    rule: '>= 18'
-    message: '年龄必须大于等于18岁'
-  - field: users.username
-    rule: length >= 5 and length <= 20
-    message: '用户名长度必须在5-20个字符之间'
-  - field: products.price
-    rule: '>= 10'
-    message: '产品价格必须大于等于10元'
-  - field: orders.total_amount
-    rule: '>= 0'
-    message: '订单总金额不能为负数'
-  - field: order_items.quantity
-    rule: '>= 1'
-    message: '产品数量必须大于等于1个'
+  # 验证用户年龄
+  - field: users.age             # 验证字段：users表的age字段
+    rule: '>= 18'                # 验证规则：大于等于18
+    message: '年龄必须大于等于18岁'  # 验证失败时的提示信息
+
+  # 验证用户名字长度
+  - field: users.username        # 验证字段：users表的username字段
+    rule: length >= 5 and length <= 20  # 验证规则：长度在5-20个字符之间
+    message: '用户名长度必须在5-20个字符之间'  # 验证失败时的提示信息
+
+  # 验证产品价格
+  - field: products.price        # 验证字段：products表的price字段
+    rule: '>= 10'                # 验证规则：大于等于10
+    message: '产品价格必须大于等于10元'  # 验证失败时的提示信息
+
+  # 验证订单总金额
+  - field: orders.total_amount   # 验证字段：orders表的total_amount字段
+    rule: '>= 0'                 # 验证规则：大于等于0
+    message: '订单总金额不能为负数'  # 验证失败时的提示信息
+
+  # 验证订单项产品数量
+  - field: order_items.quantity  # 验证字段：order_items表的quantity字段
+    rule: '>= 1'                 # 验证规则：大于等于1
+    message: '产品数量必须大于等于1个'  # 验证失败时的提示信息
 
 # 关联关系
+# 定义表之间的引用关系和唯一性约束，确保数据一致性和完整性
 relations:
+  # 外键关系：orders表引用users表
+  # 确保orders表中的user_id必须存在于users表的user_id中
   - type: foreign_key
-    from_table: orders
-    from_field: user_id
-    to_table: users
-    to_field: user_id
+    from_table: orders      # 来源表：订单表
+    from_field: user_id      # 来源字段：用户ID
+    to_table: users          # 目标表：用户表
+    to_field: user_id        # 目标字段：用户ID
+
+  # 外键关系：order_items表引用orders表
+  # 确保order_items表中的order_id必须存在于orders表的order_id中
   - type: foreign_key
-    from_table: order_items
-    from_field: order_id
-    to_table: orders
-    to_field: order_id
+    from_table: order_items  # 来源表：订单项表
+    from_field: order_id     # 来源字段：订单ID
+    to_table: orders         # 目标表：订单表
+    to_field: order_id       # 目标字段：订单ID
+
+  # 外键关系：order_items表引用products表
+  # 确保order_items表中的product_id必须存在于products表的product_id中
   - type: foreign_key
-    from_table: order_items
-    from_field: product_id
-    to_table: products
-    to_field: product_id
+    from_table: order_items  # 来源表：订单项表
+    from_field: product_id   # 来源字段：产品ID
+    to_table: products       # 目标表：产品表
+    to_field: product_id     # 目标字段：产品ID
+
+  # 唯一约束：users表中的username和email组合必须唯一
+  # 确保用户的用户名和邮箱组合不重复
   - type: unique_constraint
-    table: users
+    table: users             # 表名：用户表
     fields:
-      - username
-      - email
+      - username             # 字段1：用户名
+      - email                # 字段2：邮箱
+
+  # 唯一约束：products表中的product_name必须唯一
+  # 确保产品名称不重复
   - type: unique_constraint
-    table: products
+    table: products          # 表名：产品表
     fields:
-      - product_name
+      - product_name         # 字段：产品名称

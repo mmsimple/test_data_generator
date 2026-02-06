@@ -1,0 +1,275 @@
+# 订单-生产-发货业务流程测试数据生成配置
+version: '1.0'
+description: '订单-生产-发货业务流程测试数据生成配置'
+
+config:
+  rows: 50
+  seed: 42
+  output_dir: './output_otd'
+
+# 数据表定义
+tables:
+  # 销售订单表
+  sales_order:
+    config:
+      rows: 50  # 生成50个销售订单
+    fields:
+      # 订单ID字段
+      order_id:
+        type: integer
+        config:
+          start: 10001
+          increment: 1
+        metadata:
+          description: '订单ID'
+          primary_key: true
+          nullable: false
+      # 客户ID字段
+      customer_id:
+        type: string
+        config:
+          generator: random_string
+          min_length: 8
+          max_length: 12
+        metadata:
+          description: '客户ID'
+      # 订单类型字段
+      order_type:
+        type: choice
+        config:
+          choices:
+            - 国内单
+            - 出口单
+            - 商务单
+            - 销售单
+        metadata:
+          description: '订单类型'
+      # 订单数量字段
+      order_qty:
+        type: integer
+        config:
+          min: 1
+          max: 1000
+          distribution: normal
+        metadata:
+          description: '订单数量'
+      # 预计交付日期字段
+      expect_delivery_date:
+        type: date
+        config:
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+        metadata:
+          description: '预计交付日期'
+      # 创建时间字段
+      create_time:
+        type: date
+        config:
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+        metadata:
+          description: '创建时间'
+      # 状态字段
+      status:
+        type: choice
+        config:
+          choices:
+            - 新建
+            - 已审
+            - 生产中
+            - 完工
+        metadata:
+          description: '状态'
+
+  # 生产订单表
+  production_order:
+    config:
+      rows: 50  # 生成50个生产订单
+    fields:
+      # 生产订单ID字段
+      po_id:
+        type: integer
+        config:
+          start: 20001
+          increment: 1
+        metadata:
+          description: '生产订单ID'
+          primary_key: true
+          nullable: false
+      # 订单ID字段（外键）
+      order_id:
+        type: integer
+        config:
+          min: 10001
+          max: 10050
+          distribution: uniform
+        metadata:
+          description: '订单ID（外键）'
+          foreign_key: true
+          references: sales_order.order_id
+      # 产品ID字段
+      product_id:
+        type: string
+        config:
+          generator: random_string
+          min_length: 8
+          max_length: 12
+        metadata:
+          description: '产品ID'
+      # 计划数量字段
+      plan_qty:
+        type: integer
+        config:
+          min: 1
+          max: 1000
+          distribution: normal
+        metadata:
+          description: '计划数量'
+      # 实际数量字段
+      actual_qty:
+        type: integer
+        config:
+          min: 1
+          max: 1000
+          distribution: normal
+        metadata:
+          description: '实际数量'
+      # 状态字段
+      status:
+        type: choice
+        config:
+          choices:
+            - 新建
+            - 已审
+            - 生产中
+            - 完工
+        metadata:
+          description: '状态'
+      # 创建时间字段
+      create_time:
+        type: date
+        config:
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+        metadata:
+          description: '创建时间'
+
+  # 发货订单表
+  shipping_order:
+    config:
+      rows: 50  # 生成50个发货订单
+    fields:
+      # 发货订单ID字段
+      so_id:
+        type: integer
+        config:
+          start: 30001
+          increment: 1
+        metadata:
+          description: '发货订单ID'
+          primary_key: true
+          nullable: false
+      # 订单ID字段（外键）
+      order_id:
+        type: integer
+        config:
+          min: 10001
+          max: 10050
+          distribution: uniform
+        metadata:
+          description: '订单ID（外键）'
+          foreign_key: true
+          references: sales_order.order_id
+      # 生产订单ID字段（外键）
+      po_id:
+        type: integer
+        config:
+          min: 20001
+          max: 20050
+          distribution: uniform
+        metadata:
+          description: '生产订单ID（外键）'
+          foreign_key: true
+          references: production_order.po_id
+      # 发货数量字段
+      ship_qty:
+        type: integer
+        config:
+          min: 1
+          max: 1000
+          distribution: normal
+        metadata:
+          description: '发货数量'
+      # 发货日期字段
+      ship_date:
+        type: date
+        config:
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+        metadata:
+          description: '发货日期'
+      # 状态字段
+      status:
+        type: choice
+        config:
+          choices:
+            - 待发
+            - 已发
+            - 送达
+        metadata:
+          description: '状态'
+      # 创建时间字段
+      create_time:
+        type: date
+        config:
+          start_date: '2024-01-01'
+          end_date: '2024-12-31'
+        metadata:
+          description: '创建时间'
+
+# 输出配置
+outputs:
+  csv:
+    enabled: true
+    config:
+      include_header: true
+      delimiter: ','
+  json:
+    enabled: true
+    config:
+      indent: 2
+      array_format: true
+  excel:
+    enabled: true
+    config:
+      sheet_name: Data
+      auto_filter: true
+  sql:
+    enabled: true
+    config:
+      dialect: postgresql
+      batch_size: 100
+      include_create_table: true
+      include_truncate_table: true
+      insert_mode: insert
+
+# 关联关系
+relations:
+  # 外键关系：production_order表引用sales_order表
+  - type: foreign_key
+    from_table: production_order
+    from_field: order_id
+    to_table: sales_order
+    to_field: order_id
+  # 外键关系：shipping_order表引用sales_order表
+  - type: foreign_key
+    from_table: shipping_order
+    from_field: order_id
+    to_table: sales_order
+    to_field: order_id
+  # 外键关系：shipping_order表引用production_order表
+  - type: foreign_key
+    from_table: shipping_order
+    from_field: po_id
+    to_table: production_order
+    to_field: po_id
