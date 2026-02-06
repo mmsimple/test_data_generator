@@ -590,6 +590,234 @@ fields:
       description: "关联到user_id"
 ```
 
+---
+
+## Markdown 文档解析
+
+通过 Markdown 格式的数据库表结构文档，使用 AI 自动生成 YAML 配置，然后生成测试数据。
+
+### 准备工作
+
+1. **安装依赖**
+
+```bash
+pip install -r requirements.txt
+```
+
+新增依赖：
+- `openai>=1.0.0` - OpenAI API 客户端
+- `tenacity>=8.2.0` - 重试机制
+
+2. **设置 API 密钥**
+
+```bash
+# 方式 1: 环境变量（推荐）
+export OPENAI_API_KEY="sk-proj-your-api-key"
+
+# 方式 2: Windows PowerShell
+$env:OPENAI_API_KEY="sk-proj-your-api-key"
+
+# 方式 3: 命令行参数
+python -m src.cli parse schema docs/database.md -o config.yaml --api-key "sk-proj-your-api-key"
+```
+
+### 基本使用
+
+#### 方式 1: 先解析再生成
+
+```bash
+# 步骤 1: 将 Markdown 文档解析为 YAML 配置
+python -m src.cli parse schema docs/database_schema.md -o config.yaml
+
+# 步骤 2: 查看生成的配置
+cat config.yaml
+
+# 步骤 3: 使用配置生成测试数据
+python -m src.cli generate config.yaml --rows 100 --output-format all
+```
+
+#### 方式 2: 一步完成（推荐）
+
+```bash
+# 直接从 Markdown 生成测试数据
+python -m src.cli parse data docs/database_schema.md --rows 100
+```
+
+### 命令详解
+
+#### `parse schema` - 解析为 YAML 配置
+
+将 Markdown 文档解析为 YAML 配置文件：
+
+```bash
+python -m src.cli parse schema <markdown文件> -o <输出yaml文件> [选项]
+```
+
+常用选项：
+
+| 选项 | 说明 |
+|------|------|
+| `--model` | AI 模型：gpt-4o（默认）, gpt-4o-mini（更便宜） |
+| `--validate` | 解析后验证配置 |
+| `--verbose, -v` | 显示详细输出 |
+| `--preview` | 预览不保存 |
+| `--api-key` | API 密钥（可从环境变量读取） |
+| `--api-base` | API base URL（用于兼容服务） |
+
+示例：
+
+```bash
+# 基本用法
+python -m src.cli parse schema docs/database.md -o config.yaml
+
+# 带验证和详细输出
+python -m src.cli parse schema docs/database.md -o config.yaml --validate --verbose
+
+# 使用更便宜的模型
+python -m src.cli parse schema docs/database.md -o config.yaml --model gpt-4o-mini
+
+# 预览结果
+python -m src.cli parse schema docs/database.md -o config.yaml --preview
+```
+
+#### `parse data` - 直接生成测试数据
+
+从 Markdown 文档直接生成测试数据：
+
+```bash
+python -m src.cli parse data <markdown文件> [选项]
+```
+
+常用选项：
+
+| 选项 | 说明 |
+|------|------|
+| `--rows` | 生成行数 |
+| `--output-format` | 输出格式：csv, json, excel, sql, all |
+| `--output-dir` | 输出目录 |
+| `--validate` | 生成后验证数据 |
+| `--summary` | 显示数据摘要 |
+| `--verbose, -v` | 显示详细输出 |
+
+示例：
+
+```bash
+# 生成所有格式
+python -m src.cli parse data docs/database.md
+
+# 指定行数和格式
+python -m src.cli parse data docs/database.md --rows 50 --output-format csv
+
+# 带验证和摘要
+python -m src.cli parse data docs/database.md --validate --summary
+```
+
+### Markdown 文档格式
+
+Markdown 文档应该包含表格形式的表结构定义：
+
+```markdown
+# 数据库表结构文档
+
+## 用户表 (users)
+
+| 字段名 | 类型 | 长度 | NULL | 主键 | 默认值 | 说明 |
+|--------|------|------|------|------|--------|------|
+| user_id | INT | - | NO | YES | - | 用户ID，自增 |
+| username | VARCHAR | 50 | NO | NO | - | 用户名 |
+| email | VARCHAR | 100 | NO | NO | - | 邮箱地址 |
+| age | INT | - | NO | NO | - | 年龄 |
+
+## 订单表 (orders)
+
+| 字段名 | 类型 | 长度 | NULL | 主键 | 默认值 | 说明 |
+|--------|------|------|------|------|--------|------|
+| order_id | INT | - | NO | YES | - | 订单ID，自增 |
+| user_id | INT | - | NO | NO | - | 用户ID，外键关联users.user_id |
+| order_date | DATE | - | NO | NO | - | 订单日期 |
+```
+
+AI 会自动识别：
+- 表名（从标题推断）
+- 字段名、类型、约束
+- 主键、外键关系
+- 字段含义（如 email → email type）
+
+### 支持的字段类型
+
+| 数据库类型 | 生成器类型 | 说明 |
+|-----------|-----------|------|
+| INT, INTEGER | integer | 整数 |
+| VARCHAR, TEXT | string | 字符串 |
+| DECIMAL, MONEY | money | 金额 |
+| FLOAT, DOUBLE | float | 浮点数 |
+| DATE | date | 日期 |
+| DATETIME, TIMESTAMP | datetime | 日期时间 |
+| BOOLEAN, BOOL | boolean | 布尔值 |
+| ENUM | choice | 枚举 |
+| UUID | uuid | UUID |
+| EMAIL | email | 邮箱 |
+
+### 使用兼容的 API 服务
+
+支持 OpenAI 兼容的 API 服务（如 Azure OpenAI、国内大模型服务）：
+
+```bash
+# Azure OpenAI
+python -m src.cli parse schema docs/database.md -o config.yaml \
+  --api-base "https://your-resource.openai.azure.com"
+
+# 其他兼容服务
+python -m src.cli parse schema docs/database.md -o config.yaml \
+  --api-base "https://api.your-provider.com/v1"
+```
+
+### 完整示例流程
+
+```bash
+# 1. 安装依赖
+pip install -r requirements.txt
+
+# 2. 设置 API 密钥
+export OPENAI_API_KEY="sk-proj-xxx"
+
+# 3. 解析文档
+python -m src.cli parse schema docs/database_schema.md \
+  -o output/config.yaml \
+  --validate \
+  --verbose
+
+# 4. 查看生成的配置
+cat output/config.yaml
+
+# 5. 生成测试数据
+python -m src.cli generate output/config.yaml \
+  --rows 100 \
+  --output-format all \
+  --summary
+
+# 或一步完成
+python -m src.cli parse data docs/database_schema.md \
+  --rows 100 \
+  --output-format csv \
+  --output-dir output/test_data
+```
+
+### 注意事项
+
+1. **API 费用**：使用 OpenAI API 会产生费用，建议使用 `gpt-4o-mini` 降低成本
+2. **网络连接**：需要稳定的网络连接访问 OpenAI API
+3. **Token 限制**：大型数据库建议分批处理
+4. **验证结果**：生成的配置建议使用 `--validate` 验证
+
+### 故障排除
+
+- **API 密钥未设置**：设置环境变量或使用 `--api-key` 参数
+- **API 超时**：增加 `--timeout` 参数（默认 120 秒）
+- **速率限制**：系统会自动重试，也可增加 `--max-retries` 参数
+
+---
+
 ## 贡献
 
 欢迎提交Issue和Pull Request！
